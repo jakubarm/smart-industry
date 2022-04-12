@@ -5,6 +5,7 @@
 <link rel="import" href="view-app.html">
 <link rel="import" href="style/shared-styles.html">
 <!-- import external library -->
+<script src="serial.js"></script>
 <link rel="import" href="../lib/imask.html">
 <dom-module id="view-settings">
   <template>
@@ -53,13 +54,13 @@
     </style>
     <firebase-auth app-name="smart-mes" id="auth" user="{{user}}"></firebase-auth>
     <firebase-query app-name="smart-mes" id="appRoot" path="/data"></firebase-query>
-    <firebase-document app-name="smart-mes" id="appData" path="/data/[[userdata.key]]" data="{{appdata}}"></firebase-document>
+    <firebase-document app-name="smart-mes" id="appData" path="/data/[[user.uid]]" data="{{appdata}}"></firebase-document>
     <firebase-document app-name="smart-mes" id="userData" path="/user/[[user.uid]]" data="{{userdata}}"></firebase-document>
-    <firebase-document app-name="smart-mes" id="userToken" path="/user/[[user.uid]]/token" data="[[token]]"></firebase-document>
-    <firebase-document app-name="smart-mes" id="factoryOrderIndex" path="/data/[[userdata.key]]/factoryData/order" data="[[factoryOrderIndex]]"></firebase-document>
-    <firebase-document app-name="smart-mes" id="appNotification" path="/data/[[userdata.key]]/appData/notification" data="[[notification]]"></firebase-document>
-    <firebase-document app-name="smart-mes" id="appEmailAlert" path="/data/[[userdata.key]]/appData/email_alert" data="[[emailAlert]]"></firebase-document>
-    <firebase-document app-name="smart-mes" id="appMaterialCount" path="/data/[[userdata.key]]/appData/material_count" data="[[materialCount]]"></firebase-document>
+    <firebase-document app-name="smart-mes" id="userToken" path="/user/[[user.uid]]/token" data="{{token}}"></firebase-document>
+    <firebase-document app-name="smart-mes" id="factoryOrderIndex" path="/data/[[user.uid]]/factoryData/order" data="{{factoryOrderIndex}}"></firebase-document>
+    <firebase-document app-name="smart-mes" id="appNotification" path="/data/[[user.uid]]/appData/notification" data="{{notification}}"></firebase-document>
+    <firebase-document app-name="smart-mes" id="appEmailAlert" path="/data/[[user.uid]]/appData/email_alert" data="{{emailAlert}}"></firebase-document>
+    <firebase-document app-name="smart-mes" id="appMaterialCount" path="/data/[[user.uid]]/appData/material_count" data="{{materialCount}}"></firebase-document>
     <app-localstorage-document key="app-lang" data="{{language}}"></app-localstorage-document>
     <iron-ajax url="data/languages.json" auto handle-as="json" last-response="{{languageItems}}"></iron-ajax>
     <iron-ajax id="requestSampleData" url="data/sample/sample-parallel.json" handle-as="json" verbose="true" last-response="{{sampleData}}"></iron-ajax>
@@ -78,16 +79,18 @@
               </paper-item>
             </template>
           </vaadin-combo-box>
-          <!-- <p>Connect to device via WebUSB*</p>
+          
+          <p>Connect to device via WebUSB*</p> 
           <paper-button on-click="scanDevice" class="btn" title="Search sensor">
             Search Sensor
           </paper-button>
           <paper-button on-click="showDevice" class="btn" title="Show sensor">
             Show Sensor
-          </paper-button> -->
+          </paper-button> 
           <paper-button on-click="resetOrderCount" class="btn" title="Reset Order Count">
             {{localize('reset-order-count')}}
-          </paper-button>
+          </paper-button> 
+
           <paper-toggle-button class="switch" value="[[materialCount]]" on-change="changeMaterialCount" id="materialCountSwitch" noink>Raw Materials Calculation</paper-toggle-button>
         </div>
       </li>
@@ -148,9 +151,9 @@
           <p>{{localize('email-notifcation')}}</p>
           <paper-toggle-button class="switch" value="[[emailAlert]]" on-change="changeEmailAlert" id="emailAlertSwitch" noink>{{localize('email-notification')}}</paper-toggle-button>
           <p>{{localize('user-id')}}: [[user.uid]]</p>
-          <!-- <paper-button on-click="openManageUser" class="btn">
+           <paper-button on-click="openManageUser" class="btn">
             {{localize('manage-users')}}
-          </paper-button> -->
+          </paper-button>
         </div>
       </li>
       <li>
@@ -160,7 +163,7 @@
           <paper-input label="{{localize('phone-number')}}" id="phoneNumber" value="[[userdata.phone]]" type="tel" maxlength="15"
           pattern="^(\+\d{1,2}\s)?\(?\d{4}\)?[\s]?\d{4}[\s]?\d{1}$" always-float-label></paper-input>
           <div class="meta-data">
-            <p>{{localize('data-keychain')}}: [[userdata.key]]</p>
+            <p>{{localize('data-keychain')}}: [[user.uid]]</p>
             <p>{{localize('user-role')}}: [[userdata.role]]</p>
           </div>
           <paper-button on-click="openManageKey" class="btn">
@@ -562,7 +565,7 @@
           }
         }
       }
-
+      
       scanDevice() {
         if ('usb' in navigator) {
           let device
@@ -571,7 +574,9 @@
                 vendorId: 0x2341
               }, {
                 vendorId: 0x2a03
-              }]
+              },{
+              vendorId: 0x1A86}
+            ]
             })
             .then(device => {
               console.log(device.productName) // "Arduino Micro"

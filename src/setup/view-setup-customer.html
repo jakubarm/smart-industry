@@ -23,8 +23,8 @@
         </style>
         <firebase-auth app-name="smart-mes" id="auth" user="{{user}}"></firebase-auth>
         <firebase-document app-name="smart-mes" id="userData" path="/user/[[user.uid]]" data="{{k}}"></firebase-document>
-        <firebase-query app-name="smart-mes" id="customerQuery" path="/data/[[k.key]]/factoryData/customer" order-by-child="fname" data="{{customerData}}"></firebase-query>
-        <firebase-document app-name="smart-mes" id="editCustomerQuery" path="/data/[[k.key]]/factoryData/customer/[[editKey]]" data="{{editCustomerData}}"></firebase-document>
+        <firebase-query app-name="smart-mes" id="customerQuery" path="/data/[[user.uid]]/factoryData/customer" order-by-child="fname" data="{{customerData}}"></firebase-query>
+        <firebase-document app-name="smart-mes" id="editCustomerQuery" path="/data/[[user.uid]]/factoryData/customer/[[editKey]]" data="{{editCustomerData}}"></firebase-document>
         <app-localstorage-document key="app-lang" data="{{language}}"></app-localstorage-document>
         <ul class="app-grid">
             <li>

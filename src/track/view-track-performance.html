@@ -36,7 +36,7 @@
         </style>
         <firebase-auth app-name="smart-mes" id="auth" user="{{user}}"></firebase-auth>
         <firebase-document app-name="smart-mes" id="userData" path="/user/[[user.uid]]" data="{{k}}"></firebase-document>
-        <firebase-document app-name="smart-mes" id="productionPerformance" path="/data/[[k.key]]/performanceData" data="{{productionPerformance}}"></firebase-document>
+        <firebase-document app-name="smart-mes" id="productionPerformance" path="/data/[[user.uid]]/performanceData" data="{{productionPerformance}}"></firebase-document>
         <app-localstorage-document key="app-lang" data="{{language}}"></app-localstorage-document>
         <ul class="app-grid">
             <li>
@@ -106,9 +106,9 @@
             }
 
             calculateOEE(goodCount, idealCycleTime, plannedProductionTime) {
-                //  const availability = runTime / plannedProductionTime
-                //  const performance = (idealCycleTime * TotalCount) / runTime
-                //  const quality = goodCount / TotalCount
+                  const availability = runTime / plannedProductionTime
+                  const performance = (idealCycleTime * TotalCount) / runTime
+                  const quality = goodCount / TotalCount
                 const oee = (goodCount * idealCycleTime) / plannedProductionTime
                 return oee
             }

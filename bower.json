@@ -56,7 +56,8 @@
     "vaadin-material-theme": "^0.4.0",
     "vaadin-upload": "^4.1.0",
     "webcomponentsjs": "^1.2.0",
-    "web-animations-js": "^2.3.1"
+    "web-animations-js": "^2.3.1",
+    "polymer-redux": "^1.0.5"
   },
   "devDependencies": {
     "web-component-tester": "^6.5.0"

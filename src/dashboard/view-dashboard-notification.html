@@ -32,7 +32,7 @@
     </style>
     <firebase-auth app-name="smart-mes" id="auth" user="{{user}}"></firebase-auth>
     <firebase-document app-name="smart-mes" id="userData" path="/user/[[user.uid]]" data="{{k}}"></firebase-document>
-    <firebase-query app-name="smart-mes" id="notificationQuery" path="/data/[[k.key]]/notificationData" order-by-child="created"
+    <firebase-query app-name="smart-mes" id="notificationQuery" path="/data/[[user.uid]]/notificationData" order-by-child="created"
       data="{{notificationData}}"></firebase-query>
     <app-localstorage-document key="app-lang" data="{{language}}"></app-localstorage-document>
     <ul class="app-grid">
