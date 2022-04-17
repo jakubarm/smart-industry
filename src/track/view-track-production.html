@@ -180,7 +180,8 @@
                                 <h2 class="title">[[device.name]]</h2>
                                 <p>{{localize('type')}}: [[device.type]]</p>
                                 <p>{{localize('machine')}}: [[device.machine]]</p>
-                                <p>{{localize('count')}}: [[device.counter]]</p>
+                                <p>Count Good: [[device.counter_good]]</p>
+                                <p>Count Fail: [[device.counter_fail]]</p>
                                 <p>{{localize('updated')}}: [[timestampToTime(device.update)]]</p>
                             </div>
                             <paper-toggle-button class="switch" checked="[[device.enable]]" id="deviceControlSwitch" noink> {{localize('enabled')}}</paper-toggle-button>
@@ -397,7 +398,8 @@
             closeAddDeviceCard(){
               
                 this.$.deviceQuery.ref.push({
-                    counter: 0,
+                    counter_good: 0,
+                    counter_fail: 0,
                     name: this.name,
                     type: this.type,
                     update: Math.round(new Date().getTime() / 1000.0)
@@ -691,7 +693,8 @@
             resetCounter(e) {
                 const key = e.currentTarget.device.$key;
                 this.$.deviceQuery.ref.child(key).update({
-                    counter: 0,
+                    counter_good: 0,
+                    counter_fail: 0,
                     update: Math.round(new Date().getTime() / 1000.0)
                 })
             }
@@ -755,41 +758,49 @@
             getDeviceCounter(item, quantity, selectDevice) {
                 if (!selectDevice) return 0
                 const query = this.$.deviceQuery.ref;
-                let count = 0;
-                query.child("/" + selectDevice.$key + "/counter").on("value", (snapshot) => {
+                let count_good = 0;
+                let count_nogood = 0;
+                query.child("/" + selectDevice.$key + "/counter_good").on("value", (snapshot) => {
                     if (snapshot.val()) {
-                        count = snapshot.val() 
+                        count_good = snapshot.val() 
                         this.$.trackingQuery.ref.child(item.$key).update({
-                        job_defect: 0,
-                        job_good: count // output of station
-                    })
-                    if (count >= quantity) {
+                        job_defect: count_nogood,
+                        job_good: count_good // output of station
+                     })
+                    if (count_good >= quantity) {
                     this.$.trackingQuery.ref.child(item.$key).update({
                         actual_end: Math.round(new Date().getTime() / 1000.0),
                         job_status: 'done',
-                        job_defect: 0,
-                        job_good: count // output of station
+                        job_defect: count_nogood,
+                        job_good: count_good // output of station
                     })
+                    
                     this.$.workQuery.ref.update({
                     Station1: false 
-                })
-                }
-
+                   })
+                 }
                     }
-               
-                });
-                if (count >= quantity) {
+                    });
+                    query.child("/" + selectDevice.$key + "/counter_fail").on("value", (snapshot) => {
+                        if (snapshot.val()) {
+                        count_nogood = snapshot.val() 
+                        this.$.trackingQuery.ref.child(item.$key).update({
+                        job_defect: count_nogood,
+                      
+                    })}});
+
+                if (count_good >= quantity) {
                     this.$.trackingQuery.ref.child(item.$key).update({
                         actual_end: Math.round(new Date().getTime() / 1000.0),
                         job_status: 'done',
-                        job_defect: 0,
-                        job_good: count // output of station
+                        job_defect: count_nogood,
+                        job_good: count_good // output of station
                     })
                     this.$.workQuery.ref.update({
                     Station1: false 
                 })
                 }
-                return count
+                return count_good
             }
 
      

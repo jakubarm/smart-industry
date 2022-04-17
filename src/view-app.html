@@ -31,7 +31,6 @@
 <dom-module id="view-app">
   <template>
     <style include="shared-styles">
-
       :host {
         display: block;
       }
@@ -40,60 +39,55 @@
     <app-route route="{{route}}" pattern="[[rootPath]]:page" data="{{pageData}}" tail="{{subRoute}}"></app-route>
     <app-route route="{{subRoute}}" pattern="/:page" data="{{routeData}}" tail="{{subPageRoute}}"></app-route>
     <firebase-app name="smart-mes" auth-domain="smart-mes-11951.firebaseapp.com" database-url="https://smart-mes-11951-default-rtdb.firebaseio.com" api-key="AIzaSyCj_s3z6cmWaF2NNPCysGGLOpKJebKlQS8"
-                  storage-bucket="smart-mes-11951.appspot.com" messaging-sender-id="262404120718" project-id="smart-mes-11951"></firebase-app>
+    storage-bucket="smart-mes-11951.appspot.com" messaging-sender-id="262404120718" project-id="smart-mes-11951"></firebase-app>
     <firebase-auth app-name="smart-mes" id="userAuth" user="{{user}}" online="{{online}}" signed-in="{{signedIn}}" on-error="_handleError"></firebase-auth>
     <firebase-document app-name="smart-mes" id="userData" path="/user/[[user.uid]]" data="{{userData}}"></firebase-document>
-    <firebase-document app-name="smart-mes" id="appLanguage" path="/data/[[user.uid]]/appData/language" data="{{language}}"></firebase-document>
+    <firebase-document app-name="smart-mes" id="appLanguage" path="/data/[[userData.key]]/appData/language" data="[[language]]"></firebase-document>
     <app-localstorage-document id="appLang" key="app-lang" data="{{language}}"></app-localstorage-document>
     <iron-pages selected="[[pageData.page]]" attr-for-selected="name" fallback-selection="404" role="main">
       <view-term name="term" route="[[subRoute]]" hidden$="[[signedIn]]"></view-term>
       <view-login name="login" route="[[subRoute]]" hidden$="[[signedIn]]"></view-login>
       <view-404 name="404" route="[[subRoute]]"></view-404>
       <app-drawer-layout id="layout" fullbleed narrow="{{narrow}}" name="app">
-
+       
         <app-drawer id="drawer" slot="drawer" tabindex="-1" swipe-open="[[narrow]]" hidden="[[!signedIn]]">
           <div style="height: 100%; overflow: auto;">
-            <img class="app-logo" title="IMES" alt="Application logo" src="[[rootPath]]images/logo/logo.svg" />
-            <h1 title="IMES" class="main-logo-title">IMES</h1>
-            <h2 title="Smart Industry Helper" class="main-describe">{{localize('app-description')}}</h2>
-            <app-analytics key="UA-51514677-9"></app-analytics>
-            <nav role="navigation">
-              <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" fallback-selection="404" role="navigation">
-                <a name="dashboard" role="link" href="[[rootPath]]app/dashboard" rel="dashboard" title="Dashboard">
-                  <paper-icon-button icon="vaadin:dashboard"></paper-icon-button> {{localize('view-index-menu-dashboard')}}
-                </a>
-                <a name="setup" role="link" href="[[rootPath]]app/setup" rel="setup" title="Setup">
-                  <paper-icon-button icon="vaadin:cogs"></paper-icon-button> {{localize('view-index-menu-setup')}}
-                </a>
-                <a name="plan" role="link" href="[[rootPath]]app/plan" rel="plan" title="Plan">
-                  <paper-icon-button icon="vaadin:calendar-clock"></paper-icon-button> {{localize('view-index-menu-plan')}}
-                </a>
-                <a name="track" role="link " href="[[rootPath]]app/track" rel="track" title="Track">
-                  <paper-icon-button icon="vaadin:progressbar"></paper-icon-button> {{localize('view-index-menu-track')}}
-                </a>
-                <a name="settings" role="link" href="[[rootPath]]app/settings" rel="settings" title="Settings">
-                  <paper-icon-button icon="vaadin:tools"></paper-icon-button> {{localize('settings')}}
-                </a>
-              </iron-selector>
-            </nav>
-            <div class="separator-line" role="separator"></div>
-            <div class="flex-center">
-              <paper-button class="logout-btn" on-click="logout" title="Logout">{{localize('logout-button')}}</paper-button>
-              <div class="user-info">
-                <img id="profile" alt="user image" class="profile-image" src="[[getUserImage(userData.photoURL)]]" />
-                <paper-tooltip position="bottom" for="profile" class="profile-tooltip">
-                  <p>[[userData.email]]</p>
-                  <p>
-                    {{localize('verify-status')}}:
-                    <span class="verify">[[getVerifyStatus(user.emailVerified)]]</span>
-                  </p>
-                  <p>[[userData.company]]</p>
-                </paper-tooltip>
-                <p>[[userData.displayname]]</p>
-                <p>{{localize('version')}} 1.1.5</p>
-              </div>
+          <img class="app-logo" title="IMES" alt="Application logo" src="[[rootPath]]images/logo/logo.svg"/>
+          <h1 title="IMES" class="main-logo-title">IMES</h1>
+          <h2 title="Smart Industry Helper" class="main-describe">{{localize('app-description')}}</h2>
+          <app-analytics key="UA-51514677-9"></app-analytics>
+          <nav role="navigation">
+            <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" fallback-selection="404" role="navigation">
+              <a name="dashboard" role="link" href="[[rootPath]]app/dashboard" rel="dashboard" title="Dashboard">
+                <paper-icon-button icon="vaadin:dashboard"></paper-icon-button> {{localize('view-index-menu-dashboard')}}</a>
+              <a name="setup" role="link" href="[[rootPath]]app/setup" rel="setup" title="Setup">
+                <paper-icon-button icon="vaadin:cogs"></paper-icon-button> {{localize('view-index-menu-setup')}}</a>
+              <a name="plan" role="link" href="[[rootPath]]app/plan" rel="plan" title="Plan">
+                <paper-icon-button icon="vaadin:calendar-clock"></paper-icon-button> {{localize('view-index-menu-plan')}}</a>
+              <a name="track" role="link " href="[[rootPath]]app/track" rel="track" title="Track">
+                <paper-icon-button icon="vaadin:progressbar"></paper-icon-button> {{localize('view-index-menu-track')}}</a>
+              <a name="settings" role="link" href="[[rootPath]]app/settings" rel="settings" title="Settings">
+                <paper-icon-button icon="vaadin:tools"></paper-icon-button> {{localize('settings')}}
+              </a>
+            </iron-selector>
+          </nav>
+          <div class="separator-line" role="separator"></div>
+          <div class="flex-center">
+            <paper-button class="logout-btn" on-click="logout" title="Logout">{{localize('logout-button')}}</paper-button>
+            <div class="user-info">
+              <img id="profile" alt="user image" class="profile-image" src="[[getUserImage(userData.photoURL)]]"/>
+              <paper-tooltip position="bottom" for="profile" class="profile-tooltip">
+                <p>[[userData.email]]</p>
+                <p>{{localize('verify-status')}}:
+                  <span class="verify">[[getVerifyStatus(user.emailVerified)]]</span>
+                </p>
+                <p>[[userData.company]]</p>
+              </paper-tooltip>
+              <p>[[userData.displayname]]</p>
+              <p>{{localize('version')}} 1.1.5</p>
             </div>
           </div>
+        </div>
         </app-drawer>
 
         <app-header-layout>
@@ -117,7 +111,7 @@
       </app-drawer-layout>
     </iron-pages>
     <paper-toast id="toastVerify" class="toast-verify" always-on-top vertical-align="bottom" class="fit-bottom" duration="5000"
-                 hidden="true">
+      hidden="true">
       <div class="toast-flex-container">
         <div class="toast-flex-item">
           <p>[[toastText]]</p>
@@ -128,7 +122,6 @@
       </div>
     </paper-toast>
   </template>
-  
   <script>
     /**
      * #ViewApp
