@@ -38,8 +38,15 @@
     <app-location route="{{route}}" url-space-regex="^[[rootPath]]"></app-location>
     <app-route route="{{route}}" pattern="[[rootPath]]:page" data="{{pageData}}" tail="{{subRoute}}"></app-route>
     <app-route route="{{subRoute}}" pattern="/:page" data="{{routeData}}" tail="{{subPageRoute}}"></app-route>
-    <firebase-app name="smart-mes" auth-domain="smart-mes-11951.firebaseapp.com" database-url="https://smart-mes-11951-default-rtdb.firebaseio.com" api-key="AIzaSyCj_s3z6cmWaF2NNPCysGGLOpKJebKlQS8"
-    storage-bucket="smart-mes-11951.appspot.com" messaging-sender-id="262404120718" project-id="smart-mes-11951"></firebase-app>
+    
+    <firebase-app name="smart-mes" 
+    auth-domain="smart-mes-11951.firebaseapp.com" 
+    database-url="https://smart-mes-11951-default-rtdb.firebaseio.com" 
+    api-key="AIzaSyCj_s3z6cmWaF2NNPCysGGLOpKJebKlQS8"
+    storage-bucket="smart-mes-11951.appspot.com" 
+    messaging-sender-id="262404120718" 
+    project-id="smart-mes-11951"></firebase-app>
+
     <firebase-auth app-name="smart-mes" id="userAuth" user="{{user}}" online="{{online}}" signed-in="{{signedIn}}" on-error="_handleError"></firebase-auth>
     <firebase-document app-name="smart-mes" id="userData" path="/user/[[user.uid]]" data="{{userData}}"></firebase-document>
     <firebase-document app-name="smart-mes" id="appLanguage" path="/data/[[userData.key]]/appData/language" data="[[language]]"></firebase-document>

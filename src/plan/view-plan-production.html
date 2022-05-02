@@ -25,6 +25,7 @@
         <firebase-auth app-name="smart-mes" id="auth" user="{{user}}"></firebase-auth>
         <firebase-document app-name="smart-mes" id="userData" path="/user/[[user.uid]]" data="{{k}}"></firebase-document>
         <firebase-query app-name="smart-mes" id="productQuery" path="/data/[[user.uid]]/factoryData/product" order-by-child="id" production-by-value="true" data="{{productItems}}"></firebase-query>
+        <firebase-document app-name="smart-mes" id="workQuery" path="/data/[[user.uid]]/WorkStation" data="{{WorkItem}}"></firebase-document>
         <firebase-query app-name="smart-mes" id="orderQuery" path="/data/[[user.uid]]/orderData" order-by-child="order_no" order-by-value="true" data="{{orderItems}}"></firebase-query>
         <app-localstorage-document key="app-lang" data="{{language}}"></app-localstorage-document>
 
@@ -33,14 +34,23 @@
                 <div class="card">
                     <h1 class="title">Production Simulator</h1>
                     <div class="frame">
-
-                    </div>
-                    <div class="center">
-                        <paper-button class="btn shamrock" on-click="_triggerSimulator" toggles elevation="0" noink>Start
+                        <paper-button class="btn shamrock" on-click="Start" disabled$=[[disabled_start]] >
+                            Start Simulation   
                             <iron-icon icon="vaadin:play"></iron-icon>
+                         </paper-button>
+                        <paper-button class="btn shamrock" on-click="Pause" disabled$=[[disabled_pause]] >
+                           Pause Simulation    
+                           <iron-icon icon="vaadin:pause"></iron-icon>
+
                         </paper-button>
-                        <paper-button class="btn" on-click="_editSimulator" elevation="0" noink>Edit Simulator</paper-button>
+                        <paper-button class="btn shamrock" on-click="Error" disabled$=[[disabled_error]] >
+                            Simulation of Error in Simulator                            
+                            <iron-icon icon="vaadin:stop"></iron-icon>
+
+                         </paper-button>
+ 
                     </div>
+                   
                 </div>
             </li>
         </ul>
@@ -60,8 +70,53 @@
 
             static get properties() {
                 return {
-                    language: String
+                    language: String,
+
+                    disabled_start: {
+                     type: Boolean,
+                    value: false
+                    },
+
+                    disabled_pause: {
+                     type: Boolean,
+                    value: true
+                    },
+                    disabled_error: {
+                     type: Boolean,
+                    value: true
+                    },
                 }
+            }
+      
+           
+
+            Pause(){
+                this.set('WorkItem.Pause', true)
+                this.set('WorkItem.Error',false)
+                this.set('WorkItem.Start', false)
+                this.disabled_error=false
+                this.disabled_start=false
+                this.disabled_pause=true
+
+            }
+
+            Error( ){
+                this.set('WorkItem.Error', true)
+                this.set('WorkItem.Pause', false)
+                this.set('WorkItem.Start', false)
+                this.disabled_error=true
+                this.disabled_start=false
+                this.disabled_pause=false
+
+            }
+            Start( ){
+                this.set('WorkItem.Start', true)
+                this.set('WorkItem.Pause', false)
+                this.set('WorkItem.Error',false)
+                this.disabled_error=false
+                this.disabled_start=true
+                this.disabled_pause=false
+
             }
             connectedCallback() {
                 super.connectedCallback()

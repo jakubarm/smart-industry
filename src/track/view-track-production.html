@@ -97,9 +97,11 @@
             data="{{trackingItems}}"></firebase-query>
         <firebase-query app-name="smart-mes" id="orderQuery" path="/data/[[user.uid]]/orderData" order-by-child="order_no" data="{{orderItems}}"></firebase-query>
         <firebase-query app-name="smart-mes" id="warehouseQuery" path="/data/[[user.uid]]/warehouseData" order-by-child="order_no" data="{{warehouseItems}}"></firebase-query>
+        <firebase-document app-name="smart-mes" id="productionPerformance" path="/data/[[user.uid]]/performanceData" data="{{productionPerformance}}"></firebase-document>
         <firebase-query app-name="smart-mes" id="stationQuery" path="/data/[[user.uid]]/factoryData/station" data="{{stationItems}}"></firebase-query>
         <firebase-query app-name="smart-mes" id="deviceQuery" path="/data/[[user.uid]]/factoryData/device" data="{{deviceItems}}"></firebase-query>
         <firebase-query app-name="smart-mes" id="workQuery" path="/data/[[user.uid]]/WorkStation" data="{{WorkItem}}"></firebase-query>
+        <firebase-query app-name="smart-mes" id="WorkItem" path="/data/[[user.uid]]/WorkStation" data="{{WorkItem}}"></firebase-query>
         <firebase-query app-name="smart-mes" id="commitQuery" path="/data/[[user.uid]]/commitData"></firebase-query>
         <app-localstorage-document key="app-lang" data="{{language}}"></app-localstorage-document>
         <div class="card main-card">
@@ -153,16 +155,16 @@
                                     </paper-item>
                                 </template>
                             </vaadin-combo-box>
-                            <paper-button class="btn" on-click="check" disabled$="[[isWIP(item.job_status)]]" job="[[item]]">
+                            <paper-button class="btn" on-click="check" disabled$="[[isWIPorAdded(item.job_status)]]" job="[[item]]">
                                 ADD to Warehouse
                             </paper-button>
-                            <paper-button class="btn shamrock" on-click="openJobDialog" job="[[item]]" disabled$="[[isDone(item.job_status)]]">
+                            <paper-button class="btn shamrock" on-click="openJobDialog" job="[[item]]" disabled$="[[isDoneorAdded(item.job_status)]]">
                                 Progress Report
                             </paper-button>
                             <paper-button class="thunderbird btn" on-click="removeJob" job="[[item]]">
                                 {{localize('remove')}}
                             </paper-button>
-                            <paper-button class="btn" on-click="receiveJob" disabled$="[[isDoneOrWIP(item.job_status)]]" job="[[item]]">
+                            <paper-button class="btn" on-click="receiveJob" disabled$="[[isDoneorAddedorWIP(item.job_status)]]" job="[[item]]">
                                 {{localize('receive-job')}}
                             </paper-button>
                         </div>
@@ -329,6 +331,7 @@
                         type: Object,
                         notify: true,
                     },
+                 
                     deviceItems: {
                         type: Object,
                         computed: ''
@@ -337,6 +340,7 @@
                         type: Number,
                         value: 0
                     }
+                   
                 }
             }
 
@@ -420,13 +424,13 @@
                     job_status: 'wip'
                 })
                 this.$.workQuery.ref.update({
-                    Station1: true 
+                    Start: true 
                 })
 
             }
            check (e){
             this.selectedJob = e.currentTarget.job;
-            if (!this.defect) this.defect = 0;
+           // if (!this.defect) this.defect = 0;
                 if (parseInt(this.good) >= this.selectedJob.job_quantity) {
                     this.$.trackingQuery.ref.child(this.selectedJob.$key).update({
                     job_status: "done"})
@@ -438,20 +442,21 @@
                 this.updateFinish()
                }
                
-                    
+                     
 
            }
             updateFinish() {
-                if (!this.defect) this.defect = 0;
+              //if (!this.defect) this.defect = 0;
                 if (parseInt(this.good) >= this.selectedJob.job_quantity) {
                     this.$.workQuery.ref.update({
-                    Station1: false 
+                    Start: false 
+
                 })
                    
                     this.$.trackingQuery.ref.child(this.selectedJob.$key).update({
                         actual_end: Math.round(new Date().getTime() / 1000.0),
                         job_complete: this.getCompleteProgress(this.good, this.selectedJob.job_quantity),
-                        job_defect: parseInt(this.defect),
+                       job_defect: parseInt(this.defect),
                         job_status: "done",
                         job_good: parseInt(this.good) || (this.selectedJob.job_quantity - this.defect) // output of station
                     }).then(this._checkJobStatus())
@@ -553,7 +558,6 @@
                             };
                         });
                     }
-                    console.log("ahoj")
                     console.log(warehouse_order)
 
                     // 5.1) Sum actual duration of all jobs 
@@ -591,18 +595,24 @@
                                 result[key] = currentObject[key];
                             }
                         }
-                        console.log("ahoj")
                         return result;
                     }, {});
 
                     // 10) Delete key that can't add to firebase and replace with default index
                     delete resultObject.$key
-
+                    let sum_good=0;
                     // 11) Update order information from all jobs
                     resultObject.order_defect = sum_defect
                     resultObject.plan_duration = sum_plan_duration
                     resultObject.actual_duration = sum_actual_duration
+                    sum_good=resultObject.order_good 
                     console.log(resultObject)
+                    this.set('productionPerformance.sum_defect', sum_defect)
+                    this.set('productionPerformance.sum_plan_duration', sum_plan_duration)
+                    this.set('productionPerformance.sum_actual_duration', sum_actual_duration)
+                    this.set('productionPerformance.order_good', sum_good)
+                    this.$.trackingQuery.ref.child(this.selectedJob.$key).update({
+                        job_status: "Added to Warehouse"})
                
 
                     // 12) If not duplicate in warehouse add order to warehouse
@@ -706,11 +716,22 @@
             isWIP(status){
             return (status === 'wip' || status === 'waiting')
             }
-
+            isWIPorAdded(status){
+            return (status === 'wip' || status === 'Added to Warehouse'|| status === 'waiting' )
+            }
+            isDoneorAdded(status){
+            return (status === 'done' || status === 'Added to Warehouse' || status === 'waiting')
+            }
+            isDoneorAddedorWIP(status){
+                return((status === 'done' || status === 'Added to Warehouse' || status=== 'wip') && this.WorkItem.Start===false)
+            }
             isDoneOrWIP(status) {
                 return (status === 'wip' || status === 'done')
             }
-
+            isDoneorAddedorWIPorInProcess(status){
+            return((status === 'done' || status === 'Added to Warehouse' || status=== 'wip') && this.WorkItem.Start===false)
+             }
+        
             getMinuteToStr(minute) {
                 const sec = Number(minute*60);
                 let sign = '';
@@ -776,7 +797,7 @@
                     })
                     
                     this.$.workQuery.ref.update({
-                    Station1: false 
+                    Start: false 
                    })
                  }
                     }
@@ -797,7 +818,7 @@
                         job_good: count_good // output of station
                     })
                     this.$.workQuery.ref.update({
-                    Station1: false 
+                    Start: false 
                 })
                 }
                 return count_good
