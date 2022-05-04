@@ -101,7 +101,7 @@
         <firebase-query app-name="smart-mes" id="stationQuery" path="/data/[[user.uid]]/factoryData/station" data="{{stationItems}}"></firebase-query>
         <firebase-query app-name="smart-mes" id="deviceQuery" path="/data/[[user.uid]]/factoryData/device" data="{{deviceItems}}"></firebase-query>
         <firebase-query app-name="smart-mes" id="workQuery" path="/data/[[user.uid]]/WorkStation" data="{{WorkItem}}"></firebase-query>
-        <firebase-query app-name="smart-mes" id="WorkItem" path="/data/[[user.uid]]/WorkStation" data="{{WorkItem}}"></firebase-query>
+        <firebase-document app-name="smart-mes" id="WorkItem" path="/data/[[user.uid]]/WorkStation" data="{{WorkItem}}"></firebase-document>
         <firebase-query app-name="smart-mes" id="commitQuery" path="/data/[[user.uid]]/commitData"></firebase-query>
         <app-localstorage-document key="app-lang" data="{{language}}"></app-localstorage-document>
         <div class="card main-card">
@@ -419,13 +419,16 @@
             }
 
             receiveJob(e) {
+                
                 this.$.trackingQuery.ref.child(e.currentTarget.job.$key).update({
                     actual_start: Math.round(new Date().getTime() / 1000.0),
                     job_status: 'wip'
                 })
                 this.$.workQuery.ref.update({
                     Start: true 
+                    
                 })
+                this._pushNotification(`Production Started!`, 'normal')
 
             }
            check (e){
@@ -723,7 +726,7 @@
             return (status === 'done' || status === 'Added to Warehouse' || status === 'waiting')
             }
             isDoneorAddedorWIP(status){
-                return((status === 'done' || status === 'Added to Warehouse' || status=== 'wip') && this.WorkItem.Start===false)
+                return((status === 'done' || status === 'Added to Warehouse' || status=== 'wip') )
             }
             isDoneOrWIP(status) {
                 return (status === 'wip' || status === 'done')
