@@ -429,9 +429,11 @@
                     
                 })
                 this._pushNotification(`Production Started!`, 'normal')
+                this.set('WorkItem.restart_counter', "start")
 
             }
            check (e){
+            this.set('WorkItem.restart_counter', "restart")
             this.selectedJob = e.currentTarget.job;
            // if (!this.defect) this.defect = 0;
                 if (parseInt(this.good) >= this.selectedJob.job_quantity) {
