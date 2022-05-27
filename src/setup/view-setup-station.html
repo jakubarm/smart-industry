@@ -4,6 +4,7 @@
 <link rel="import" href="../style/shared-styles.html">
 <link rel="import" href="redux-mixin.html">
 
+
 <dom-module id="view-setup-station">
     <template>
         <style include="shared-styles app-grid-style flat-button">
@@ -88,11 +89,11 @@
         </style>
         <firebase-auth app-name="smart-mes" id="auth" user="{{user}}"></firebase-auth>
         <firebase-document app-name="smart-mes" id="userData" path="/user/[[user.uid]]" data="{{k}}"></firebase-document>
-        <firebase-query app-name="smart-mes" id="stationQuery" path="/data/[[k.key]]/factoryData/station" data="{{stationItems}}"
+        <firebase-query app-name="smart-mes" id="stationQuery" path="/data/[[user.uid]]/factoryData/station" data="{{stationItems}}"
             order-by-child="st_number"></firebase-query>
-        <firebase-query app-name="smart-mes" id="machineQuery" path="/data/[[k.key]]/factoryData/machine" data="{{machineItems}}"
+        <firebase-query app-name="smart-mes" id="machineQuery" path="/data/[[user.uid]]/factoryData/machine" data="{{machineItems}}"
             order-by-child="name"></firebase-query>
-        <firebase-document app-name="smart-mes" id="editStationQuery" path="/data/[[k.key]]/factoryData/station/[[editKey]]" data="{{editStationItems}}"></firebase-document>
+        <firebase-document app-name="smart-mes" id="editStationQuery" path="/data/[[user.uid]]/factoryData/station/[[editKey]]" data="{{editStationItems}}"></firebase-document>
         <app-localstorage-document key="app-lang" data="{{language}}"></app-localstorage-document>
         <!-- Add Station Card -->
         <div class="card main-card" hidden="[[showAddStation]]">

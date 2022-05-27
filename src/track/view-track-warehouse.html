@@ -27,15 +27,15 @@
         </style>
         <firebase-auth app-name="smart-mes" id="auth" user="{{user}}"></firebase-auth>
         <firebase-document app-name="smart-mes" id="userData" path="/user/[[user.uid]]" data="{{k}}"></firebase-document>
-        <firebase-query app-name="smart-mes" id="orderQuery" path="/data/[[k.key]]/orderData" order-by-child="order_no" data="{{orderItems}}"></firebase-query>
-        <firebase-query app-name="smart-mes" id="warehouseQuery" path="/data/[[k.key]]/warehouseData" data="{{warehouseItems}}"></firebase-query>
+        <firebase-query app-name="smart-mes" id="warehouseQuery" path="/data/[[user.uid]]/warehouseData" order-by-child="name" data="{{warehouseItems}}"></firebase-query>
+        <firebase-query app-name="smart-mes" id="orderQuery" path="/data/[[user.uid]]/orderData" order-by-child="order_no" data="{{orderItems}}"></firebase-query>
         <app-localstorage-document key="app-lang" data="{{language}}"></app-localstorage-document>
         <ul class="app-grid">
             <li>
                 <div class="card">
                     <h1 class="title">Completed Orders Warehouse</h1>
 
-                    <vaadin-grid id="warehouseTable" items="[[warehouseItems]]" size="100">
+                    <vaadin-grid id="warehouseTable" items="{{warehouseItems}}" size="100">
                         <vaadin-grid-column flex="1">
                             <template class="header">
                                 <vaadin-grid-sorter path="order_no">
@@ -222,7 +222,7 @@
                     let key = e.currentTarget.item.$key
                     this.$.warehouseQuery.ref.child(key).remove()
                     this.toastText = 'notification-delete-successfully'
-                    sthis.$.toastAlert.open()
+                    this.$.toastAlert.open()
                 }
             }
 

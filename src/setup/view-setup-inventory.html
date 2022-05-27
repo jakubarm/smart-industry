@@ -1,4 +1,4 @@
-<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+ <link rel="import" href="../../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../../bower_components/vaadin-material-theme/vaadin-grid.html">
 <link rel="import" href="../../bower_components/vaadin-material-theme/vaadin-grid-selection-column.html">
 <link rel="import" href="../view-app.html">
@@ -19,10 +19,10 @@
         </style>
         <firebase-auth app-name="smart-mes" id="auth" user="{{user}}"></firebase-auth>
         <firebase-document app-name="smart-mes" id="userData" path="/user/[[user.uid]]" data="{{k}}"></firebase-document>
-        <firebase-query app-name="smart-mes" id="notificationQuery" path="/data/[[k.key]]/notificationData"></firebase-query>
-        <firebase-query app-name="smart-mes" id="inventoryQuery" path="/data/[[k.key]]/factoryData/inventory" order-by-child="name"
+        <firebase-query app-name="smart-mes" id="notificationQuery" path="/data/[[user.uid]]/notificationData"></firebase-query>
+        <firebase-query app-name="smart-mes" id="inventoryQuery" path="/data/[[user.uid]]/factoryData/inventory" order-by-child="name"
             data="{{inventoryData}}"></firebase-query>
-        <firebase-document app-name="smart-mes" id="editInventoryQuery" path="/data/[[k.key]]/factoryData/inventory/[[editKey]]"
+        <firebase-document app-name="smart-mes" id="editInventoryQuery" path="/data/[[user.uid]]/factoryData/inventory/[[editKey]]"
             data="{{editInventoryData}}"></firebase-document>
         <app-localstorage-document key="app-lang" data="{{language}}"></app-localstorage-document>
         <ul class="app-grid">

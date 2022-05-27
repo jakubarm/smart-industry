@@ -86,13 +86,13 @@
     </style>
     <firebase-auth app-name="smart-mes" id="auth" user="{{user}}"></firebase-auth>
     <firebase-document app-name="smart-mes" id="userData" path="/user/[[user.uid]]" data="{{k}}"></firebase-document>
-    <firebase-query app-name="smart-mes" id="orderQuery" path="/data/[[k.key]]/orderData" data="{{orderData}}"></firebase-query>
-    <firebase-query app-name="smart-mes" id="machineQuery" path="/data/[[k.key]]/factoryData/machine" data="{{machineData}}"></firebase-query>
-    <firebase-query app-name="smart-mes" id="stationQuery" path="/data/[[k.key]]/factoryData/station" data="{{stationData}}"></firebase-query>
-    <firebase-document app-name="smart-mes" id="factorySchedule" path="/data/[[k.key]]/factoryData/schedule" data="{{factorySchedule}}"></firebase-document>
-    <firebase-document app-name="smart-mes" id="factoryOperation" path="/data/[[k.key]]/factoryData/operation" data="{{factoryOperation}}"></firebase-document>
-    <firebase-document app-name="smart-mes" id="factoryPerformance" path="/data/[[k.key]]/factoryData/performance" data="{{factoryPerformance}}"></firebase-document>
-    <firebase-document app-name="smart-mes" id="productionPerformance" path="/data/[[k.key]]/performanceData" data="{{productionPerformance}}"></firebase-document>
+    <firebase-query app-name="smart-mes" id="orderQuery" path="/data/[[user.uid]]/orderData" data="{{orderData}}"></firebase-query>
+    <firebase-query app-name="smart-mes" id="machineQuery" path="/data/[[user.uid]]/factoryData/machine" data="{{machineData}}"></firebase-query>
+    <firebase-query app-name="smart-mes" id="stationQuery" path="/data/[[user.uid]]/factoryData/station" data="{{stationData}}"></firebase-query>
+    <firebase-document app-name="smart-mes" id="factorySchedule" path="/data/[[user.uid]]/factoryData/schedule" data="{{factorySchedule}}"></firebase-document>
+    <firebase-document app-name="smart-mes" id="factoryOperation" path="/data/[[user.uid]]/factoryData/operation" data="{{factoryOperation}}"></firebase-document>
+    <firebase-document app-name="smart-mes" id="factoryPerformance" path="/data/[[user.uid]]/factoryData/performance" data="{{factoryPerformance}}"></firebase-document>
+    <firebase-document app-name="smart-mes" id="productionPerformance" path="/data/[[user.uid]]/performanceData" data="{{productionPerformance}}"></firebase-document>
     <app-localstorage-document key="app-lang" data="{{language}}"></app-localstorage-document>
     <div class="card main-card">
       <ul class="app-grid">

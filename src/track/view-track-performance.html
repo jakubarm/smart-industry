@@ -36,7 +36,8 @@
         </style>
         <firebase-auth app-name="smart-mes" id="auth" user="{{user}}"></firebase-auth>
         <firebase-document app-name="smart-mes" id="userData" path="/user/[[user.uid]]" data="{{k}}"></firebase-document>
-        <firebase-document app-name="smart-mes" id="productionPerformance" path="/data/[[k.key]]/performanceData" data="{{productionPerformance}}"></firebase-document>
+        <firebase-document app-name="smart-mes" id="productionPerformance" path="/data/[[user.uid]]/performanceData" data="{{productionPerformance}}"></firebase-document>
+        <firebase-query app-name="smart-mes" id="warehouseQuery" path="/data/[[user.uid]]/warehouseData" order-by-child="order_no" data="{{warehouseItems}}"></firebase-query>
         <app-localstorage-document key="app-lang" data="{{language}}"></app-localstorage-document>
         <ul class="app-grid">
             <li>
@@ -48,6 +49,11 @@
                     <div class="center">
                         <paper-button class="btn" on-click="resetPerformance">
                             Reset Performance Meter
+                        </paper-button>
+                    </div>
+                    <div class="center">
+                        <paper-button class="btn" on-click="calculateOEE">
+                            Calculate OEE
                         </paper-button>
                     </div>
                 </div>
@@ -71,7 +77,9 @@
             static get properties() {
                 return {
                     language: String,
+                    warehouseItems: Object,
                     orderHistoryData: Object,
+                    trackingItems: Object,
                     performanceData: Object,
                     gaugeOption: {
                         type: Object,
@@ -105,12 +113,18 @@
                 ]
             }
 
-            calculateOEE(goodCount, idealCycleTime, plannedProductionTime) {
-                //  const availability = runTime / plannedProductionTime
-                //  const performance = (idealCycleTime * TotalCount) / runTime
-                //  const quality = goodCount / TotalCount
-                const oee = (goodCount * idealCycleTime) / plannedProductionTime
-                return oee
+            calculateOEE() {
+                let goodCount= this.productionPerformance.order_good;
+                let duration= this.productionPerformance.sum_actual_duration;
+                let plannedProductionTime= this.productionPerformance.sum_plan_duration;
+                let TotalCount= goodCount+ this.productionPerformance.sum_defect;
+                let idealCycleTime= plannedProductionTime/TotalCount;
+
+                  const availability = duration / plannedProductionTime
+                  const performance = (idealCycleTime * TotalCount) / duration
+                  const quality = goodCount / TotalCount
+                const oee = Math.round(availability*performance*quality*100)
+                return this.set('productionPerformance.oee',oee) 
             }
 
             resetPerformance() {

@@ -41,8 +41,8 @@
         </style>
         <firebase-auth app-name="smart-mes" id="auth" user="{{user}}"></firebase-auth>
         <firebase-document app-name="smart-mes" id="userData" path="/user/[[user.uid]]" data="{{k}}"></firebase-document>
-        <firebase-query app-name="smart-mes" id="machineQuery" path="/data/[[k.key]]/factoryData/machine" data="{{machineItems}}"></firebase-query>
-        <firebase-document app-name="smart-mes" id="editMachineQuery" path="/data/[[k.key]]/factoryData/machine/[[editKey]]" data="{{editMachineItems}}"></firebase-document>
+        <firebase-query app-name="smart-mes" id="machineQuery" path="/data/[[user.uid]]/factoryData/machine" data="{{machineItems}}"></firebase-query>
+        <firebase-document app-name="smart-mes" id="editMachineQuery" path="/data/[[user.uid]]/factoryData/machine/[[editKey]]" data="{{editMachineItems}}"></firebase-document>
         <app-localstorage-document key="app-lang" data="{{language}}"></app-localstorage-document>
         <!-- Add Machine Card -->
         <div class="card main-card" hidden="[[showAddMachine]]">

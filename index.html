@@ -4,27 +4,27 @@
   <meta charset="utf-8">
   <base href="/">
   <title>IMES Platform</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <meta name="description" content="Intelligent Manufacturing Execution Systems for JobShop Manufacturing"/>
-  <meta name="theme-color" content="#FFFFFF"/>
-  <meta name="mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-capable" content="yes"/>
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-  <meta name="apple-mobile-web-app-title" content="IMES"/>
-  <meta name="application-name" content="IMES"/>
-  <meta name="msapplication-TileImage" content="images/manifest/icon-144x144.png"/>
-  <meta name="msapplication-TileColor" content="#FFFFFF"/>
-  <meta name="msapplication-tap-highlight" content="no"/>
-  <link rel="icon" type="image/png" href="images/favicon.png"/>
-  <link rel="manifest" href="manifest.json"/>
-  <link rel="apple-touch-icon" href="images/manifest/any.svg"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Intelligent Manufacturing Execution Systems for JobShop Manufacturing" />
+  <meta name="theme-color" content="#FFFFFF" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="IMES" />
+  <meta name="application-name" content="IMES" />
+  <meta name="msapplication-TileImage" content="images/manifest/icon-144x144.png" />
+  <meta name="msapplication-TileColor" content="#FFFFFF" />
+  <meta name="msapplication-tap-highlight" content="no" />
+  <link rel="icon" type="image/png" href="images/favicon.png" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="images/manifest/any.svg" />
   <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
-  <link rel="apple-touch-icon" sizes="128x128" href="images/manifest/icon-128x128.png"/>
-  <link rel="apple-touch-icon" sizes="144x144" href="images/manifest/icon-144x144.png"/>
-  <link rel="apple-touch-icon" sizes="152x152" href="images/manifest/icon-152x152.png"/>
-  <link rel="apple-touch-icon" sizes="192x192" href="images/manifest/icon-192x192.png"/>
-  <link rel="apple-touch-icon" sizes="256x256" href="images/manifest/icon-256x256.png"/>
-  <link rel="apple-touch-icon" sizes="512x512" href="images/manifest/icon-512x512.png"/>
+  <link rel="apple-touch-icon" sizes="128x128" href="images/manifest/icon-128x128.png" />
+  <link rel="apple-touch-icon" sizes="144x144" href="images/manifest/icon-144x144.png" />
+  <link rel="apple-touch-icon" sizes="152x152" href="images/manifest/icon-152x152.png" />
+  <link rel="apple-touch-icon" sizes="192x192" href="images/manifest/icon-192x192.png" />
+  <link rel="apple-touch-icon" sizes="256x256" href="images/manifest/icon-256x256.png" />
+  <link rel="apple-touch-icon" sizes="512x512" href="images/manifest/icon-512x512.png" />
   <style>
     body {
       margin: 0;
@@ -40,21 +40,46 @@
       -moz-osx-font-smoothing: grayscale;
     }
   </style>
-  <script>window.Polymer = {rootPath: '/'};</script> 
+  <script>window.Polymer = {rootPath: '/'};</script>
   <link rel="import" href="src/view-app.html">
 </head>
 <body>
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.0/firebase-analytics.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+  
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    const firebaseConfig = {
+      apiKey: "AIzaSyCj_s3z6cmWaF2NNPCysGGLOpKJebKlQS8",
+      authDomain: "smart-mes-11951.firebaseapp.com",
+      databaseURL: "https://smart-mes-11951-default-rtdb.firebaseio.com",
+      projectId: "smart-mes-11951",
+      storageBucket: "smart-mes-11951.appspot.com",
+      messagingSenderId: "262404120718",
+      appId: "1:262404120718:web:04220bc128040ab10669df",
+      measurementId: "G-DD4CV8YE85"
+    };
+  
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+  </script>
   <view-app></view-app>
   <script src="bower_components/webcomponentsjs/webcomponents-loader.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function() {
-        navigator.serviceWorker.register('service-worker.js', { 
-          scope: window.Polymer.rootPath 
-        });
-      });
+    window.addEventListener('load', function() {
+    navigator.serviceWorker.register('service-worker.js', {
+    scope: window.Polymer.rootPath
+    });
+    });
     }
   </script>
   <noscript>Please enable JavaScript to view this application.</noscript>
 </body>
+
 </html>

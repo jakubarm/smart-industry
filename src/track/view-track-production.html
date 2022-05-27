@@ -93,13 +93,16 @@
 
         <firebase-auth app-name="smart-mes" id="auth" user="{{user}}"></firebase-auth>
         <firebase-document app-name="smart-mes" id="userData" path="/user/[[user.uid]]" data="{{k}}"></firebase-document>
-        <firebase-query app-name="smart-mes" id="trackingQuery" path="/data/[[k.key]]/trackingData" order-by-child="job_station"
+        <firebase-query app-name="smart-mes" id="trackingQuery" path="/data/[[user.uid]]/trackingData" order-by-child="job_station"
             data="{{trackingItems}}"></firebase-query>
-        <firebase-query app-name="smart-mes" id="orderQuery" path="/data/[[k.key]]/orderData" order-by-child="order_no" data="{{orderItems}}"></firebase-query>
-        <firebase-query app-name="smart-mes" id="warehouseQuery" path="/data/[[k.key]]/warehouseData" order-by-child="order_no" data="{{warehouseItems}}"></firebase-query>
-        <firebase-query app-name="smart-mes" id="stationQuery" path="/data/[[k.key]]/factoryData/station" data="{{stationItems}}"></firebase-query>
-        <firebase-query app-name="smart-mes" id="deviceQuery" path="/data/[[k.key]]/factoryData/device" data="{{deviceItems}}"></firebase-query>
-        <firebase-query app-name="smart-mes" id="commitQuery" path="/data/[[k.key]]/commitData"></firebase-query>
+        <firebase-query app-name="smart-mes" id="orderQuery" path="/data/[[user.uid]]/orderData" order-by-child="order_no" data="{{orderItems}}"></firebase-query>
+        <firebase-query app-name="smart-mes" id="warehouseQuery" path="/data/[[user.uid]]/warehouseData" order-by-child="order_no" data="{{warehouseItems}}"></firebase-query>
+        <firebase-document app-name="smart-mes" id="productionPerformance" path="/data/[[user.uid]]/performanceData" data="{{productionPerformance}}"></firebase-document>
+        <firebase-query app-name="smart-mes" id="stationQuery" path="/data/[[user.uid]]/factoryData/station" data="{{stationItems}}"></firebase-query>
+        <firebase-query app-name="smart-mes" id="deviceQuery" path="/data/[[user.uid]]/factoryData/device" data="{{deviceItems}}"></firebase-query>
+        <firebase-query app-name="smart-mes" id="workQuery" path="/data/[[user.uid]]/WorkStation" data="{{WorkItem}}"></firebase-query>
+        <firebase-document app-name="smart-mes" id="WorkItem" path="/data/[[user.uid]]/WorkStation" data="{{WorkItem}}"></firebase-document>
+        <firebase-query app-name="smart-mes" id="commitQuery" path="/data/[[user.uid]]/commitData"></firebase-query>
         <app-localstorage-document key="app-lang" data="{{language}}"></app-localstorage-document>
         <div class="card main-card">
             <h1 class="title">{{localize('work-in-progress-job-tracking')}}</h1>
@@ -152,14 +155,17 @@
                                     </paper-item>
                                 </template>
                             </vaadin-combo-box>
-                            <paper-button class="btn" on-click="receiveJob" disabled$="[[isDoneOrWIP(item.job_status)]]" job="[[item]]">
-                                {{localize('receive-job')}}
+                            <paper-button class="btn" on-click="check" disabled$="[[isWIPorAdded(item.job_status)]]" job="[[item]]">
+                                ADD to Warehouse
                             </paper-button>
-                            <paper-button class="btn shamrock" on-click="openJobDialog" job="[[item]]" disabled$="[[isDone(item.job_status)]]">
+                            <paper-button class="btn shamrock" on-click="openJobDialog" job="[[item]]" disabled$="[[isDoneorAdded(item.job_status)]]">
                                 Progress Report
                             </paper-button>
                             <paper-button class="thunderbird btn" on-click="removeJob" job="[[item]]">
                                 {{localize('remove')}}
+                            </paper-button>
+                            <paper-button class="btn" on-click="receiveJob" disabled$="[[isDoneorAddedorWIP(item.job_status)]]" job="[[item]]">
+                                {{localize('receive-job')}}
                             </paper-button>
                         </div>
                     </li>
@@ -176,7 +182,8 @@
                                 <h2 class="title">[[device.name]]</h2>
                                 <p>{{localize('type')}}: [[device.type]]</p>
                                 <p>{{localize('machine')}}: [[device.machine]]</p>
-                                <p>{{localize('count')}}: [[device.counter]]</p>
+                                <p>Count Good: [[device.counter_good]]</p>
+                                <p>Count Fail: [[device.counter_fail]]</p>
                                 <p>{{localize('updated')}}: [[timestampToTime(device.update)]]</p>
                             </div>
                             <paper-toggle-button class="switch" checked="[[device.enable]]" id="deviceControlSwitch" noink> {{localize('enabled')}}</paper-toggle-button>
@@ -199,6 +206,7 @@
                 </paper-button>
             </div>
         </div>
+        
         <vaadin-dialog id="reportJobDialog" class="dialog">
             <template>
                 <custom-style>
@@ -246,6 +254,53 @@
                 </div>
             </template>
         </vaadin-dialog>
+        <vaadin-dialog id="addDeviceDialog" class="dialog">
+            <template>
+                <custom-style>
+                    <style include="view-settings">
+                        :host {
+                            max-width: 500px;
+                            margin-top: 100px;
+                            --app-background-color: transpalent;
+                            --paper-input-container-focus-color: var( --app-primary-color);
+                        }
+
+                        [part="content"] {
+                            padding: 20px 30px;
+                        }
+
+                        h1 {
+                            margin: 10px 0 20px 0;
+                        }
+
+                        .center {
+                            text-align: center;
+                        }
+
+                        .btn-group {
+                            margin: 10px 0 0 0;
+                            display: flex;
+                            text-align: center;
+                        }
+
+                        .btn {
+                            margin: 0 10px 0px 10px;
+                        }
+                    </style>
+                </custom-style>
+                <h1 class="center">device </h1>
+                <paper-input label="{{localize('name')}}" id="devicename" value="{{name}}" type="text" always-float-label></paper-input>
+                <paper-input label="{{localize('type')}}" id="devicetype" value="{{type}}" type="text" always-float-label></paper-input>
+                <div class="btn-group">
+                    <paper-button dialog-dismiss on-click="closeAddDeviceCard1">
+                        {{localize('dismiss')}}
+                    </paper-button>
+                    <paper-button dialog-confirm autofocus on-click="closeAddDeviceCard">
+                        {{localize('save')}}
+                    </paper-button>
+                </div>
+            </template>
+        </vaadin-dialog>
 
     </template>
     <script>
@@ -276,6 +331,7 @@
                         type: Object,
                         notify: true,
                     },
+                 
                     deviceItems: {
                         type: Object,
                         computed: ''
@@ -284,6 +340,7 @@
                         type: Number,
                         value: 0
                     }
+                   
                 }
             }
 
@@ -313,7 +370,48 @@
                 this.$.reportJobDialog.opened = true;
                 this.selectedJob = e.currentTarget.job;
             }
+            
 
+            removeDevice(e) {
+                if (window.confirm("Remove this device?") == true) {
+                    const key = e.currentTarget.device.$key;
+                    this.$.deviceQuery.ref.child(key).remove();
+                }
+            }
+
+            openAddDeviceCard(e) {
+                this.selectedDevice = e.currentTarget.device;
+                this.$.addDeviceDialog.opened = true;
+               
+
+            }
+            closeAddDeviceCard1(){
+                
+                this.$.addDeviceDialog.opened = false;
+            }
+
+            _openEditMachineCard(e){
+                this.selectedDevice = e.currentTarget.device;
+                this.$.editDeviceDialog.opened = true;
+                this.$.deviceQuery.ref.child(key).update({
+                    name: this.name,
+                    type: this.type,
+                    update: Math.round(new Date().getTime() / 1000.0)
+                });
+            }
+            closeAddDeviceCard(){
+              
+                this.$.deviceQuery.ref.push({
+                    counter_good: 0,
+                    counter_fail: 0,
+                    name: this.name,
+                    type: this.type,
+                    update: Math.round(new Date().getTime() / 1000.0)
+                })
+               
+                this.$.addDeviceDialog.opened = false;
+  
+            }
             closeJobDialog() {
                 this.$.reportJobDialog.opened = false;
                 Polymer.dom(this.$.reportJobDialog).querySelectorAll('#goodCount').value = ''
@@ -321,22 +419,55 @@
             }
 
             receiveJob(e) {
+                
                 this.$.trackingQuery.ref.child(e.currentTarget.job.$key).update({
                     actual_start: Math.round(new Date().getTime() / 1000.0),
                     job_status: 'wip'
                 })
-            }
+                this.$.workQuery.ref.update({
+                    Start: true 
+                    
+                })
+                this._pushNotification(`Production Started!`, 'normal')
+                this.set('WorkItem.restart_counter', "start")
 
-            updateFinish() {
-                if (!this.defect) this.defect = 0;
+            }
+           check (e){
+            this.set('WorkItem.restart_counter', "restart")
+            this.selectedJob = e.currentTarget.job;
+           // if (!this.defect) this.defect = 0;
                 if (parseInt(this.good) >= this.selectedJob.job_quantity) {
                     this.$.trackingQuery.ref.child(this.selectedJob.$key).update({
+                    job_status: "done"})
+                    this.$.reportJobDialog.opened = false;
+                    this.updateFinish()
+                   
+                }
+            else{
+                this.updateFinish()
+               }
+               
+                     
+
+           }
+            updateFinish() {
+              //if (!this.defect) this.defect = 0;
+                if (parseInt(this.good) >= this.selectedJob.job_quantity) {
+                    this.$.workQuery.ref.update({
+                    Start: false 
+
+                })
+                   
+                    this.$.trackingQuery.ref.child(this.selectedJob.$key).update({
                         actual_end: Math.round(new Date().getTime() / 1000.0),
-                        job_status: 'done',
                         job_complete: this.getCompleteProgress(this.good, this.selectedJob.job_quantity),
-                        job_defect: parseInt(this.defect),
+                       job_defect: parseInt(this.defect),
+                        job_status: "done",
                         job_good: parseInt(this.good) || (this.selectedJob.job_quantity - this.defect) // output of station
                     }).then(this._checkJobStatus())
+                
+                    this.$.trackingQuery.ref.child(key).remove()
+              
                 } else {
                     this.$.trackingQuery.ref.child(this.selectedJob.$key).update({
                         job_complete: this.getCompleteProgress(this.good, this.selectedJob.job_quantity),
@@ -345,7 +476,9 @@
                     }).then(this._checkJobStatus())
                 }
                 this.$.reportJobDialog.opened = false;
-                this.selectedJob = '';
+                this.selectedJob = '';        
+                    
+               
             }
 
             getActualDuration(start, end) {
@@ -378,9 +511,11 @@
                 const order_group = this.trackingItems.reduce((r, a) => {
                     r[a.order_no] = r[a.order_no] || [];
                     r[a.order_no].push(a);
+                    
                     return r;
                 }, []);
-
+                
+                console.log(order_group)
                 const arr = Object.values(this.trackingItems)
                 const unique = (v, i, a) => a.indexOf(v) === i
                 const productNames = arr.map(product => product.order_product).filter(unique)
@@ -391,22 +526,27 @@
                 let isStatusDone = ((element) => {
                     return (element.job_status === 'done')
                 })
-
+                console.log("ahoj")
                 // 3) check that element job_status of every item is == done
                 let done_order = [];
+
                 if (order_group) {
+                   
                     order_group.map((key, i) => {
                         if (order_group[i].every(isStatusDone)) {
+                        
+                   
                             done_order.push(order_group[i]);
                         }
                     })
+                    console.log(done_order)
+
                 }
 
                 // 4) if every jobs in order is done so push to done_order 
                 if (done_order.length > 0) {
                     let warehouse_order;
-
-                    for (let i = 0; i < done_order.length; i++) {
+              for (let i = 0; i < done_order.length; i++) {
                         warehouse_order = done_order[i].map((value, index, arr) => {
                             return {
                                 order_delivery: value.order_delivery,
@@ -423,22 +563,22 @@
                             };
                         });
                     }
-                    //console.log(warehouse_order)
+                    console.log(warehouse_order)
 
                     // 5.1) Sum actual duration of all jobs 
                     let sum_actual_duration = warehouse_order.reduce((a, b) =>
                         a + b.actual_duration, 0)
-                    //console.log(sum_actual_duration)
+                    console.log(sum_actual_duration)
 
                     // 5.2) Sum plan duration of all jobs 
                     let sum_plan_duration = warehouse_order.reduce((a, b) =>
                         a + b.plan_duration, 0)
-                    //console.log(sum_plan_duration)
+                   console.log(sum_plan_duration)
 
                     // 5.3) Sum defect of all jobs 
                     let sum_defect = warehouse_order.reduce((a, b) =>
                         a + b.order_defect, 0)
-                    //console.log(sum_defect)
+                    console.log(sum_defect)
 
                     // 6) Remove duplicate order no from array export single
                     let filterDoneOrder = warehouse_order
@@ -465,18 +605,28 @@
 
                     // 10) Delete key that can't add to firebase and replace with default index
                     delete resultObject.$key
-
+                    let sum_good=0;
                     // 11) Update order information from all jobs
                     resultObject.order_defect = sum_defect
                     resultObject.plan_duration = sum_plan_duration
                     resultObject.actual_duration = sum_actual_duration
+                    sum_good=resultObject.order_good 
                     console.log(resultObject)
+                    this.set('productionPerformance.sum_defect', sum_defect)
+                    this.set('productionPerformance.sum_plan_duration', sum_plan_duration)
+                    this.set('productionPerformance.sum_actual_duration', sum_actual_duration)
+                    this.set('productionPerformance.order_good', sum_good)
+                    this.$.trackingQuery.ref.child(this.selectedJob.$key).update({
+                        job_status: "Added to Warehouse"})
+               
 
                     // 12) If not duplicate in warehouse add order to warehouse
                     let isDuplicated = this.warehouseItems.map(item => item.order_no).indexOf(resultObject.order_no) >
                         -1
                     if (!isDuplicated) {
                         this._addToWarehouse(resultObject)
+                        console.log(resultObject)
+                        
                     }
                 }
             }
@@ -511,6 +661,7 @@
 
             _addToWarehouse(data) {
                 if (data) {
+              
                     this.$.warehouseQuery.ref.push(data)
                     // TODO: add notification 
                     this._addToWorkCommit()
@@ -518,6 +669,7 @@
             }
 
             _updateOrderTable(warehouse) {
+                console.log(key);
                 if (warehouse.length > 0) {
                     this.warehouseItems.map((data) => {
                         this.$.orderQuery.ref.orderByChild("order_no").equalTo(data.order_no).once(
@@ -556,7 +708,8 @@
             resetCounter(e) {
                 const key = e.currentTarget.device.$key;
                 this.$.deviceQuery.ref.child(key).update({
-                    counter: 0,
+                    counter_good: 0,
+                    counter_fail: 0,
                     update: Math.round(new Date().getTime() / 1000.0)
                 })
             }
@@ -564,11 +717,26 @@
             isDone(status) {
                 return (status === 'done' || status === 'waiting')
             }
-
+            
+            isWIP(status){
+            return (status === 'wip' || status === 'waiting')
+            }
+            isWIPorAdded(status){
+            return (status === 'wip' || status === 'Added to Warehouse'|| status === 'waiting' )
+            }
+            isDoneorAdded(status){
+            return (status === 'done' || status === 'Added to Warehouse' || status === 'waiting')
+            }
+            isDoneorAddedorWIP(status){
+                return((status === 'done' || status === 'Added to Warehouse' || status=== 'wip') )
+            }
             isDoneOrWIP(status) {
                 return (status === 'wip' || status === 'done')
             }
-
+            isDoneorAddedorWIPorInProcess(status){
+            return((status === 'done' || status === 'Added to Warehouse' || status=== 'wip') && this.WorkItem.Start===false)
+             }
+        
             getMinuteToStr(minute) {
                 const sec = Number(minute*60);
                 let sign = '';
@@ -616,33 +784,52 @@
             getDeviceCounter(item, quantity, selectDevice) {
                 if (!selectDevice) return 0
                 const query = this.$.deviceQuery.ref;
-                let count = 0;
-                query.child("/" + selectDevice.$key + "/counter").once("value", (snapshot) => {
+                let count_good = 0;
+                let count_nogood = 0;
+                query.child("/" + selectDevice.$key + "/counter_good").on("value", (snapshot) => {
                     if (snapshot.val()) {
-                        count = snapshot.val()
-                    }
-                });
-                if (count >= quantity) {
+                        count_good = snapshot.val() 
+                        this.$.trackingQuery.ref.child(item.$key).update({
+                        job_defect: count_nogood,
+                        job_good: count_good // output of station
+                     })
+                    if (count_good >= quantity) {
                     this.$.trackingQuery.ref.child(item.$key).update({
                         actual_end: Math.round(new Date().getTime() / 1000.0),
                         job_status: 'done',
-                        job_defect: 0,
-                        job_good: count // output of station
+                        job_defect: count_nogood,
+                        job_good: count_good // output of station
                     })
+                    
+                    this.$.workQuery.ref.update({
+                    Start: false 
+                   })
+                 }
+                    }
+                    });
+                    query.child("/" + selectDevice.$key + "/counter_fail").on("value", (snapshot) => {
+                        if (snapshot.val()) {
+                        count_nogood = snapshot.val() 
+                        this.$.trackingQuery.ref.child(item.$key).update({
+                        job_defect: count_nogood,
+                      
+                    })}});
+
+                if (count_good >= quantity) {
+                    this.$.trackingQuery.ref.child(item.$key).update({
+                        actual_end: Math.round(new Date().getTime() / 1000.0),
+                        job_status: 'done',
+                        job_defect: count_nogood,
+                        job_good: count_good // output of station
+                    })
+                    this.$.workQuery.ref.update({
+                    Start: false 
+                })
                 }
-                return count
+                return count_good
             }
 
-            removeDevice(e) {
-                if (window.confirm("Remove this device?") == true) {
-                    const key = e.currentTarget.device.$key;
-                    this.$.deviceQuery.ref.child(key).remove();
-                }
-            }
-
-            openAddDeviceCard() {
-
-            }
+     
         }
         customElements.define(ViewTrackProduction.is, ViewTrackProduction);
     </script>

@@ -14,14 +14,16 @@
     "headers": [
       {
         "source": "**/service-worker.js",
-        "headers": [{
-          "key": "Service-Worker-Allowed",
-          "value": "/"
-        }]
+        "headers": [
+          {
+            "key": "Service-Worker-Allowed",
+            "value": "/"
+          }
+        ]
       }
     ]
+  },
+  "database": {
+    "rules": "database.rules.json"
   }
 }
-
-
-
